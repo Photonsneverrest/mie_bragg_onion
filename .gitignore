@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Build / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Jupyter / IDE
+.ipynb_checkpoints/
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local data / outputs
+frames/
+GIF/
+*.html
+
+# Optional: keep large local notebooks / exports out of git
+# notebooks/tmp/
