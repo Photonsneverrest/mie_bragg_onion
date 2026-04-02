@@ -27,14 +27,6 @@ from __future__ import annotations
 # - wavelengths are plotted in nm
 # - theta is given in degrees for user-facing inputs, internally in radians
 # - dB scale uses 10*log10(value), appropriate for power-like quantities
-#
-# Note:
-# If you later turn this into a package, you may want to replace:
-#     from solver import ScatteringResult
-#     from integration import IntegratedScatteringResult
-# with:
-#     from .solver import ScatteringResult
-#     from .integration import IntegratedScatteringResult
 
 from typing import Iterable, Literal
 
@@ -42,8 +34,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from numpy.typing import NDArray
 
-from solver import ScatteringResult
-from integration import IntegratedScatteringResult
+from .solver import ScatteringResult
+from .integration import IntegratedScatteringResult
 
 
 FloatArray = NDArray[np.float64]

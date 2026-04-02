@@ -19,12 +19,6 @@ from __future__ import annotations
 # - assumes azimuthal symmetry around the incident axis
 # - integration uses:
 #       dΩ = 2π sin(theta) dtheta
-#
-# Note:
-# If you later turn this into a package, you may want to replace:
-#     from solver import ScatteringResult
-# with:
-#     from .solver import ScatteringResult
 
 from dataclasses import dataclass
 from typing import Iterable, Literal
@@ -32,7 +26,7 @@ from typing import Iterable, Literal
 import numpy as np
 from numpy.typing import NDArray
 
-from solver import ScatteringResult
+from .solver import ScatteringResult
 
 
 FloatArray = NDArray[np.float64]

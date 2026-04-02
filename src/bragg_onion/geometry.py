@@ -23,12 +23,7 @@ from __future__ import annotations
 # - Bragg layers use labels "A" and "B"
 # - optional extra outer shell uses label "O"
 # - all lengths are stored internally in meters
-#
-# Note:
-# If you later turn this into a package, you may want to replace:
-#     from materials import Dispersion
-# with:
-#     from .materials import Dispersion
+
 
 from dataclasses import dataclass
 from typing import Callable, Iterable, Literal
@@ -36,7 +31,7 @@ from typing import Callable, Iterable, Literal
 import numpy as np
 from numpy.typing import NDArray
 
-from materials import Dispersion
+from .materials import Dispersion
 
 
 FloatArray = NDArray[np.float64]

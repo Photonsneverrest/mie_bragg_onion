@@ -36,17 +36,17 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 from numpy.typing import NDArray
 
-from materials import Dispersion
-from geometry import (
+from .materials import Dispersion
+from .geometry import (
     ExtinctionModifier,
     ExtraOuterShellSpec,
     build_bragg_onion_from_peak_wavelength,
     build_bragg_onion_from_thicknesses,
     resolve_layer_stack,
 )
-from solver import ScatteringResult, run_scattnlay_spectrum
-from integration import IntegratedScatteringResult, integrate_collection_na
-from colour_adapter import ColourComputationResult, compute_colour_from_integrated_scattering
+from .solver import ScatteringResult, run_scattnlay_spectrum
+from .integration import IntegratedScatteringResult, integrate_collection_na
+from .colour_adapter import ColourComputationResult, compute_colour_from_integrated_scattering
 
 
 FloatArray = NDArray[np.float64]

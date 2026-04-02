@@ -22,14 +22,6 @@ from __future__ import annotations
 # - radii are cumulative outer radii [m]
 # - x has shape (n_wavelengths, n_layers) for spectrum calculations
 # - m has shape (n_wavelengths, n_layers) for spectrum calculations
-#
-# Note:
-# If you later turn this into a package, you may want to replace:
-#     from materials import Dispersion
-#     from geometry import ResolvedLayerStack
-# with:
-#     from .materials import Dispersion
-#     from .geometry import ResolvedLayerStack
 
 from dataclasses import dataclass
 from typing import Iterable
@@ -39,8 +31,8 @@ from numpy.typing import NDArray
 
 from scattnlay import scattnlay # type: ignore
 
-from materials import Dispersion
-from geometry import ResolvedLayerStack
+from .materials import Dispersion
+from .geometry import ResolvedLayerStack
 
 
 FloatArray = NDArray[np.float64]

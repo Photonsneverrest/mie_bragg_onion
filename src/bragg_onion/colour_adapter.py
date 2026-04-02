@@ -26,8 +26,8 @@ from typing import Any, Literal
 import numpy as np
 from numpy.typing import NDArray
 
-from integration import IntegratedScatteringResult
-from spectrum_colour_props import compute_color_properties
+from .integration import IntegratedScatteringResult
+from .spectrum_colour_props import compute_color_properties
 
 
 FloatArray = NDArray[np.float64]

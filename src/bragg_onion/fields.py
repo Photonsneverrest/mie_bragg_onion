@@ -48,8 +48,8 @@ from numpy.typing import NDArray
 
 import scattnlay  # type: ignore
 
-from geometry import ResolvedLayerStack
-from solver import build_scattnlay_inputs_single_wavelength
+from .geometry import ResolvedLayerStack
+from .solver import build_scattnlay_inputs_single_wavelength
 
 
 FloatArray = NDArray[np.float64]
