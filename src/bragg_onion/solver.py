@@ -29,7 +29,13 @@ from typing import Iterable
 import numpy as np
 from numpy.typing import NDArray
 
-from scattnlay import scattnlay # type: ignore
+try:
+    from scattnlay import scattnlay  # type: ignore
+except ImportError as exc:
+    raise ImportError(
+        "scattnlay is required for bragg_onion.solver. "
+        "Install the optional dependency with: pip install 'bragg-onion[scattnlay]'"
+    ) from exc
 
 from .materials import Dispersion
 from .geometry import ResolvedLayerStack

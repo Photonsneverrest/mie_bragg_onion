@@ -46,7 +46,13 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Circle
 from numpy.typing import NDArray
 
-import scattnlay  # type: ignore
+try:
+    import scattnlay  # type: ignore
+except ImportError as exc:
+    raise ImportError(
+        "scattnlay is required for bragg_onion.fields. "
+        "Install the optional dependency with: pip install 'bragg-onion[scattnlay]'"
+    ) from exc
 
 from .geometry import ResolvedLayerStack
 from .solver import build_scattnlay_inputs_single_wavelength

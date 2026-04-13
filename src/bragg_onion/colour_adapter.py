@@ -21,12 +21,13 @@ from __future__ import annotations
 # - choose quantity="c_collected_m2" or "fraction_collected"
 
 from dataclasses import dataclass
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 from numpy.typing import NDArray
 
-from .integration import IntegratedScatteringResult
+if TYPE_CHECKING:
+    from .integration import IntegratedScatteringResult
 from .spectrum_colour_props import compute_color_properties
 
 

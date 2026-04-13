@@ -28,14 +28,15 @@ from __future__ import annotations
 # - theta is given in degrees for user-facing inputs, internally in radians
 # - dB scale uses 10*log10(value), appropriate for power-like quantities
 
-from typing import Iterable, Literal
+from typing import Iterable, Literal, TYPE_CHECKING
 
 import numpy as np
 import matplotlib.pyplot as plt
 from numpy.typing import NDArray
 
-from .solver import ScatteringResult
-from .integration import IntegratedScatteringResult
+if TYPE_CHECKING:
+    from .solver import ScatteringResult
+    from .integration import IntegratedScatteringResult
 
 
 FloatArray = NDArray[np.float64]

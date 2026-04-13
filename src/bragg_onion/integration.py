@@ -21,12 +21,13 @@ from __future__ import annotations
 #       dΩ = 2π sin(theta) dtheta
 
 from dataclasses import dataclass
-from typing import Iterable, Literal
+from typing import Iterable, Literal, TYPE_CHECKING
 
 import numpy as np
 from numpy.typing import NDArray
 
-from .solver import ScatteringResult
+if TYPE_CHECKING:
+    from .solver import ScatteringResult
 
 
 FloatArray = NDArray[np.float64]

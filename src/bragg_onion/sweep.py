@@ -44,9 +44,17 @@ from .geometry import (
     build_bragg_onion_from_thicknesses,
     resolve_layer_stack,
 )
-from .solver import ScatteringResult, run_scattnlay_spectrum
-from .integration import IntegratedScatteringResult, integrate_collection_na
-from .colour_adapter import ColourComputationResult, compute_colour_from_integrated_scattering
+
+try:
+    from .solver import ScatteringResult, run_scattnlay_spectrum
+    from .integration import IntegratedScatteringResult, integrate_collection_na
+    from .colour_adapter import ColourComputationResult, compute_colour_from_integrated_scattering
+except ImportError as exc:
+    raise ImportError(
+        "bragg_onion.sweep requires the optional scattering stack "
+        "(solver/integration/colour_adapter and ultimately scattnlay). "
+        "Install it with: pip install 'bragg-onion[scattnlay]'"
+    ) from exc
 
 
 FloatArray = NDArray[np.float64]
