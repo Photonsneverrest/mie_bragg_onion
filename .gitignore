@@ -35,15 +35,8 @@ frames/
 GIF/
 *.html
 
-# ============================================================
 # Local research / working content (not public)
-# ============================================================
-notebooks/*
-scripts/*
-outputs/*
-trash/*
-
-# Keep empty folder structure in Git
-!notebooks/.gitkeep
-!scripts/.gitkeep
-!outputs/.gitkeep
+notebooks/
+scripts/
+outputs/
+trash/
