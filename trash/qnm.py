@@ -1,2 +1,0 @@
-# %%
-# quasi-normal mode analysis
