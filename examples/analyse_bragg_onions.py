@@ -1,4 +1,3 @@
-# %%
 from __future__ import annotations
 
 """
@@ -61,8 +60,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from bragg_onion.materials import MaterialFileSpec, load_materials # type: ignore
-from bragg_onion.sweep import ( # type: ignore
+from bragg_onion.materials import MaterialFileSpec, load_materials
+from bragg_onion.sweep import (
     run_bragg_onion_sweep,
     make_plotting_aliases,
     plot_sweep_metric,
@@ -80,7 +79,6 @@ from bragg_onion.sweep import ( # type: ignore
 # ------------------------------------------------------------
 FILE_PS = r"C:\Users\SchwarzN\OneDrive - Université de Fribourg\Institution\P1_BraggSpericalPigments\Simulation\RefractiveIndices\PS(hPS)\x=0.0.txt"
 FILE_P2VP = r"C:\Users\SchwarzN\OneDrive - Université de Fribourg\Institution\P1_BraggSpericalPigments\Simulation\RefractiveIndices\P2VP(PDP)\x=0.0.txt"
-FILE_PMMA = r"C:\Users\SchwarzN\OneDrive - Université de Fribourg\Institution\P1_BraggSpericalPigments\Simulation\RefractiveIndices\PolymethylMethacrylate.txt"
 FILE_H2O = r"C:\Users\SchwarzN\OneDrive - Université de Fribourg\Institution\P1_BraggSpericalPigments\Simulation\RefractiveIndices\Water_HaleQuerry.txt"
 
 # ------------------------------------------------------------
@@ -196,11 +194,11 @@ def main() -> None:
     # --------------------------------------------------------
     # 1) Validate material file paths
     # --------------------------------------------------------
-    for p in [FILE_PS, FILE_P2VP, FILE_H2O, FILE_PMMA]:
+    for p in [FILE_PS, FILE_P2VP, FILE_H2O]:
         if not Path(p).exists():
             raise FileNotFoundError(
                 f"Material file not found:\n{p}\n\n"
-                "Please edit the FILE_PS / FILE_P2VP / FILE_H2O / FILE_PMMA paths in this script."
+                "Please edit the FILE_PS / FILE_P2VP / FILE_H2O paths in this script."
             )
 
     # --------------------------------------------------------
@@ -243,16 +241,6 @@ def main() -> None:
             k_column=None,
             extrapolation="extrapolate",
         ),
-        "PMMA": MaterialFileSpec(
-            name="PMMA",
-            path=FILE_PMMA,
-            wavelength_unit="nm",
-            skiprows=2,
-            names=["Wavelength", "RefractiveIndex", "k"],
-            n_column="RefractiveIndex",
-            k_column="k",
-            extrapolation="extrapolate",
-        ),
     }
 
     print("Loading materials...")
@@ -261,7 +249,7 @@ def main() -> None:
     mat_A = loaded["PS"]
     mat_B = loaded["P2VP"]
     medium = loaded["H2O"]
-    mat_C = loaded["PMMA"]
+
     # --------------------------------------------------------
     # 4) Run the sweep
     # --------------------------------------------------------

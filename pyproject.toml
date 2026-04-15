@@ -34,10 +34,10 @@ classifiers = [
 
 [project.optional-dependencies]
 scattnlay = [
-  "python-scattnlay>=2.4"
+  "scattnlay>=2.4"
 ]
 full = [
-  "python-scattnlay>=2.4"
+  "scattnlay>=2.4"
 ]
 
 [project.urls]
