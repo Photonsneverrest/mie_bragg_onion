@@ -303,14 +303,14 @@ def colour_performance(
     # )
 
     # eta Y as deviation score from maximum chroma Y_rel at this hue in Rosch-MacAdam solid
+    # Sign is positive if Y_rel is above the maximum chroma Y_rel, negative if below.
     target_Y_rel = float(hue_maxchroma_props["Y_rel"])
-    deviation_Y = abs(Y_rel - target_Y_rel)
-    delta_deviation_Y_max = max(abs(0 - target_Y_rel), abs(100 - target_Y_rel))
-    eta_Y = (
-        1.0 - deviation_Y / delta_deviation_Y_max
-        if delta_deviation_Y_max > 0
-        else 0.0
-    )
+    delta_Y = Y_rel - target_Y_rel
+
+    delta_Y_max = max(target_Y_rel, (100 - target_Y_rel))
+
+    eta_Y = (1.0 - abs(delta_Y) / delta_Y_max if delta_Y_max > 0 else 0.0)
+    eta_Y_signed = eta_Y if delta_Y >= 0 else -eta_Y
 
     # eta_Y = (
     #     Y_rel / float(hue_maxchroma_props["Y_rel"])
@@ -318,7 +318,7 @@ def colour_performance(
     #     else 0.0
     # )
 
-    return float(eta_C), float(eta_L_signed), float(eta_Y)
+    return float(eta_C), float(eta_L_signed), float(eta_Y_signed)
 
 
 def srgb_to_hex(r: float, g: float, b: float) -> str:
