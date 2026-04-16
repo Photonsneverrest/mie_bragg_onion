@@ -286,15 +286,15 @@ def colour_performance(
         else 0.0
     )
 
-    # eta lightness as deviation score from maximum chroma lightness at this hue in Rosch-MacAdam solid
+    # eta lightness as deviation score from maximum chroma lightness at this hue in Rosch-MacAdam solid.
+    # Sign is positive if lightness is above the maximum chroma lightness, negative if below.
     target_L = float(hue_maxchroma_props["L"])
-    deviation = abs(lightness - target_L)
-    delta_deviation_max = max(abs(0 - target_L), abs(100 - target_L))
-    eta_L = (
-        1.0 - deviation / delta_deviation_max
-        if delta_deviation_max > 0
-        else 0.0
-    )
+    delta = lightness - target_L
+
+    delta_max = max(target_L, (100 - target_L))
+    
+    eta_L = (1.0 -abs(delta) / delta_max if delta_max > 0 else 0.0)
+    eta_L_signed = eta_L if delta >= 0 else -eta_L
 
     # eta_L = (
     #     lightness / float(hue_maxchroma_props["L"])
@@ -318,7 +318,7 @@ def colour_performance(
     #     else 0.0
     # )
 
-    return float(eta_C), float(eta_L), float(eta_Y)
+    return float(eta_C), float(eta_L_signed), float(eta_Y)
 
 
 def srgb_to_hex(r: float, g: float, b: float) -> str:
