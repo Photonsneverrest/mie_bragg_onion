@@ -300,8 +300,6 @@ class MaterialFileSpec:
     """
     Specification for loading one material file.
 
-    This mirrors your previous loading style but makes it explicit and reusable.
-
     Parameters
     ----------
     name :
@@ -348,8 +346,6 @@ class MaterialFileSpec:
 def load_tabulated_material(spec: MaterialFileSpec) -> TabulatedDispersion:
     """
     Load a material from file according to a MaterialFileSpec.
-
-    This is the main loader you will likely use in your package.
     """
     path = Path(spec.path)
     if not path.exists():

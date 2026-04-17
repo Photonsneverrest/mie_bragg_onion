@@ -226,6 +226,12 @@ This repository currently provides:
 
 The optional simulation stack is actively being stabilized across platforms.
 
+## Acknowledgements
+
+O. Peña and U. Pal, "Scattering of electromagnetic radiation
+by a multilayered sphere," Computer Physics Communications,
+vol. 180, Nov. 2009, pp. 2348-2354.
+
 ## License
 
 This project is licensed under the terms of the **GNU General Public License v3.0 or later**.
