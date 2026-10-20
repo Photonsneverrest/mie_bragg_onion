@@ -41,6 +41,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Literal
 
+import warnings
+
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import Circle
@@ -81,6 +83,9 @@ __all__ = [
     "plot_field_magnitude",
     "plot_poynting_streamlines",
     "plot_poynting_vectors",
+    "make_distributed_seeds",
+    "filter_streamline_seeds",
+    "plot_poynting_streamlines_safe",
 ]
 
 
@@ -270,14 +275,129 @@ def _vector_magnitude(field: ComplexArray) -> FloatArray:
     """
     return np.sqrt(np.sum(np.abs(field) ** 2, axis=-1)).astype(np.float64)
 
+def _real_vector_magnitude(
+    vector_field: FloatArray,
+) -> FloatArray:
+    """
+    Stable Euclidean magnitude of a real three-component field.
 
-def _compute_poynting_vector(e_field: ComplexArray, h_field: ComplexArray) -> FloatArray:
+    Uses sequential np.hypot to avoid overflow from squaring very
+    large components.
     """
-    Compute time-averaged Poynting vector:
-        S = 0.5 * Re(E x conj(H))
+
+    vector_field = np.asarray(
+        vector_field,
+        dtype=np.float64,
+    )
+
+    if (
+        vector_field.ndim < 1
+        or vector_field.shape[-1] != 3
+    ):
+        raise ValueError(
+            "Expected a real vector field whose final dimension "
+            "has length 3."
+        )
+
+    magnitude = np.hypot(
+        np.hypot(
+            vector_field[..., 0],
+            vector_field[..., 1],
+        ),
+        vector_field[..., 2],
+    )
+
+    magnitude[
+        ~np.isfinite(magnitude)
+    ] = np.nan
+
+    return magnitude.astype(
+        np.float64
+    )
+
+
+# def _compute_poynting_vector(e_field: ComplexArray, h_field: ComplexArray) -> FloatArray:
+#     """
+#     Compute time-averaged Poynting vector:
+#         S = 0.5 * Re(E x conj(H))
+#     """
+#     s = 0.5 * np.real(np.cross(e_field, np.conjugate(h_field)))
+#     return np.asarray(s, dtype=np.float64)
+
+def _compute_poynting_vector(
+    e_field: ComplexArray,
+    h_field: ComplexArray,
+) -> FloatArray:
     """
-    s = 0.5 * np.real(np.cross(e_field, np.conjugate(h_field)))
-    return np.asarray(s, dtype=np.float64)
+    Compute the time-averaged Poynting vector:
+
+        S = 0.5 Re(E x H*)
+
+    Numerical overflow or nonfinite field values are converted to
+    NaN. They are not silently clipped to finite physical values.
+    """
+
+    e_field = np.asarray(
+        e_field,
+        dtype=np.complex128,
+    )
+
+    h_field = np.asarray(
+        h_field,
+        dtype=np.complex128,
+    )
+
+    with np.errstate(
+        over="ignore",
+        invalid="ignore",
+        divide="ignore",
+    ):
+
+        s = (
+            0.5
+            * np.real(
+                np.cross(
+                    e_field,
+                    np.conjugate(
+                        h_field
+                    ),
+                )
+            )
+        )
+
+    s = np.asarray(
+        s,
+        dtype=np.float64,
+    )
+
+    invalid = ~np.isfinite(
+        s
+    )
+
+    if np.any(invalid):
+
+        invalid_point_count = int(
+            np.count_nonzero(
+                np.any(
+                    invalid,
+                    axis=-1,
+                )
+            )
+        )
+
+        warnings.warn(
+            "Nonfinite Poynting-vector values were produced at "
+            f"{invalid_point_count} spatial points. "
+            "These values were replaced by NaN. This can indicate "
+            "a near-field numerical instability.",
+            RuntimeWarning,
+        )
+
+        s[
+            invalid
+        ] = np.nan
+
+    return s
 
 
 def _plane_components(
@@ -360,9 +480,10 @@ def _add_layer_boundaries(ax: plt.Axes, radii_m: FloatArray) -> None:
             fill=False,
             edgecolor="white",
             linewidth=1.0,
-            alpha=0.85,
+            alpha=0.2,
         )
         ax.add_patch(circle)
+
 
 
 def _percentile_limits(
@@ -382,6 +503,23 @@ def _percentile_limits(
     vmax = float(np.percentile(arr[finite], upper)) if upper is not None else None
     return vmin, vmax
 
+# def _reference_speed_for_masking(
+#     speed: np.ndarray,
+#     *,
+#     base_mask: np.ndarray,
+#     percentile: float = 99.0,
+# ) -> float:
+#     """
+#     Compute a robust reference speed from finite, unmasked points
+#     using a percentile instead of the absolute maximum.
+#     """
+#     speed = np.asarray(speed, dtype=float)
+#     valid = (~base_mask) & np.isfinite(speed)
+
+#     if not np.any(valid):
+#         return 0.0
+
+#     return float(np.percentile(speed[valid], percentile))
 def _reference_speed_for_masking(
     speed: np.ndarray,
     *,
@@ -389,16 +527,43 @@ def _reference_speed_for_masking(
     percentile: float = 99.0,
 ) -> float:
     """
-    Compute a robust reference speed from finite, unmasked points
-    using a percentile instead of the absolute maximum.
+    Compute a robust finite reference speed.
+
+    Nonfinite and nonpositive values are ignored. np.hypot should be
+    used to calculate speed before calling this function.
     """
-    speed = np.asarray(speed, dtype=float)
-    valid = (~base_mask) & np.isfinite(speed)
+
+    speed = np.asarray(
+        speed,
+        dtype=float,
+    )
+
+    valid = (
+        ~np.asarray(
+            base_mask,
+            dtype=bool,
+        )
+        & np.isfinite(speed)
+        & (speed > 0.0)
+    )
 
     if not np.any(valid):
         return 0.0
 
-    return float(np.percentile(speed[valid], percentile))
+    reference_speed = float(
+        np.nanpercentile(
+            speed[valid],
+            percentile,
+        )
+    )
+
+    if (
+        not np.isfinite(reference_speed)
+        or reference_speed <= 0.0
+    ):
+        return 0.0
+
+    return reference_speed
 
 def make_line_seeds(
     start_nm: tuple[float, float],
@@ -566,6 +731,315 @@ def make_edge_seeds(
 
     return np.column_stack([coord1_vals, coord2_vals]).astype(np.float64)
 
+def make_distributed_seeds(
+    field_result: FieldMapResult,
+    *,
+    n_seeds: int = 120,
+    random_seed: int = 12345,
+    radial_domain: Literal[
+        "all",
+        "inside",
+        "outside",
+    ] = "all",
+    avoid_boundary_fraction: float = 0.015,
+    minimum_radius_fraction: float = 0.0,
+    maximum_radius_fraction: float | None = None,
+) -> FloatArray:
+    """
+    Generate reproducible, approximately uniform random seed points.
+
+    Seeds are distributed uniformly over area, not uniformly in radius.
+    This is useful for delta and scattered Poynting fields, where a
+    single incident-edge seed line may miss recirculation and backflow.
+
+    Parameters
+    ----------
+    radial_domain
+        "all":
+            Entire plotted rectangle.
+
+        "inside":
+            Only inside the sphere.
+
+        "outside":
+            Only outside the sphere.
+
+    avoid_boundary_fraction
+        Fraction of the plotting width excluded from each outer edge.
+
+    minimum_radius_fraction, maximum_radius_fraction
+        Optional radial limits expressed relative to the outer radius.
+
+    Returns
+    -------
+    np.ndarray
+        Seed locations in plotting coordinates, in nm.
+    """
+    if n_seeds < 1:
+        raise ValueError(
+            "n_seeds must be at least 1."
+        )
+
+    if radial_domain not in {
+        "all",
+        "inside",
+        "outside",
+    }:
+        raise ValueError(
+            "radial_domain must be "
+            "'all', 'inside', or 'outside'."
+        )
+
+    rng = np.random.default_rng(
+        random_seed
+    )
+
+    c1_min = float(
+        field_result.coord1_m[0]
+        * 1e9
+    )
+
+    c1_max = float(
+        field_result.coord1_m[-1]
+        * 1e9
+    )
+
+    c2_min = float(
+        field_result.coord2_m[0]
+        * 1e9
+    )
+
+    c2_max = float(
+        field_result.coord2_m[-1]
+        * 1e9
+    )
+
+    outer_radius_nm = float(
+        field_result.outer_radius_m
+        * 1e9
+    )
+
+    c1_margin = (
+        avoid_boundary_fraction
+        * (
+            c1_max
+            - c1_min
+        )
+    )
+
+    c2_margin = (
+        avoid_boundary_fraction
+        * (
+            c2_max
+            - c2_min
+        )
+    )
+
+    minimum_radius_nm = (
+        minimum_radius_fraction
+        * outer_radius_nm
+    )
+
+    if maximum_radius_fraction is None:
+        maximum_radius_nm = np.inf
+    else:
+        maximum_radius_nm = (
+            maximum_radius_fraction
+            * outer_radius_nm
+        )
+
+    accepted_points = []
+
+    maximum_attempts = max(
+        1000,
+        100 * n_seeds,
+    )
+
+    for _ in range(
+        maximum_attempts
+    ):
+        coord1 = rng.uniform(
+            c1_min + c1_margin,
+            c1_max - c1_margin,
+        )
+
+        coord2 = rng.uniform(
+            c2_min + c2_margin,
+            c2_max - c2_margin,
+        )
+
+        radius = np.hypot(
+            coord1,
+            coord2,
+        )
+
+        if (
+            radius < minimum_radius_nm
+            or radius > maximum_radius_nm
+        ):
+            continue
+
+        if (
+            radial_domain == "inside"
+            and radius >= outer_radius_nm
+        ):
+            continue
+
+        if (
+            radial_domain == "outside"
+            and radius <= outer_radius_nm
+        ):
+            continue
+
+        accepted_points.append(
+            (
+                coord1,
+                coord2,
+            )
+        )
+
+        if len(
+            accepted_points
+        ) >= n_seeds:
+            break
+
+    if len(
+        accepted_points
+    ) < n_seeds:
+        raise RuntimeError(
+            "Could not generate the requested number of seeds. "
+            f"Generated {len(accepted_points)} of {n_seeds}. "
+            "Relax the radial-domain restrictions."
+        )
+
+    return np.asarray(
+        accepted_points,
+        dtype=np.float64,
+    )
+
+def filter_streamline_seeds(
+    field_result: FieldMapResult,
+    start_points_nm: np.ndarray,
+    *,
+    valid_vector_mask: np.ndarray,
+    minimum_grid_cells_from_edge: int = 1,
+) -> FloatArray:
+    """
+    Remove seeds that lie outside the grid, on masked cells, or too
+    close to the plot boundary.
+
+    This prevents Matplotlib streamplot from receiving seeds that
+    generate trajectories with zero segments.
+    """
+
+    seeds = np.asarray(
+        start_points_nm,
+        dtype=float,
+    )
+
+    if (
+        seeds.ndim != 2
+        or seeds.shape[1] != 2
+    ):
+        raise ValueError(
+            "start_points_nm must have shape (N, 2)."
+        )
+
+    coord1_nm = (
+        np.asarray(
+            field_result.coord1_m,
+            dtype=float,
+        )
+        * 1e9
+    )
+
+    coord2_nm = (
+        np.asarray(
+            field_result.coord2_m,
+            dtype=float,
+        )
+        * 1e9
+    )
+
+    if valid_vector_mask.shape != (
+        len(coord2_nm),
+        len(coord1_nm),
+    ):
+        raise ValueError(
+            "valid_vector_mask has incompatible shape."
+        )
+
+    accepted = []
+
+    for seed in seeds:
+
+        coord1_value = float(
+            seed[0]
+        )
+
+        coord2_value = float(
+            seed[1]
+        )
+
+        index_1 = int(
+            np.argmin(
+                np.abs(
+                    coord1_nm
+                    - coord1_value
+                )
+            )
+        )
+
+        index_2 = int(
+            np.argmin(
+                np.abs(
+                    coord2_nm
+                    - coord2_value
+                )
+            )
+        )
+
+        if (
+            index_1
+            < minimum_grid_cells_from_edge
+            or index_1
+            >= len(coord1_nm)
+            - minimum_grid_cells_from_edge
+            or index_2
+            < minimum_grid_cells_from_edge
+            or index_2
+            >= len(coord2_nm)
+            - minimum_grid_cells_from_edge
+        ):
+            continue
+
+        if not valid_vector_mask[
+            index_2,
+            index_1,
+        ]:
+            continue
+
+        accepted.append(
+            (
+                coord1_value,
+                coord2_value,
+            )
+        )
+
+    if not accepted:
+        return np.empty(
+            (
+                0,
+                2,
+            ),
+            dtype=np.float64,
+        )
+
+    return np.asarray(
+        accepted,
+        dtype=np.float64,
+    )
+
 def _choose_magnitude_array(
     field_result: FieldMapResult,
     *,
@@ -722,10 +1196,33 @@ def compute_field_map(
     s_sca_like = _compute_poynting_vector(e_sca_like, h_sca_like)
     s_delta = s_total - s_inc
 
-    s_total_mag = np.sqrt(np.sum(s_total**2, axis=-1)).astype(np.float64)
-    s_inc_mag = np.sqrt(np.sum(s_inc**2, axis=-1)).astype(np.float64)
-    s_sca_like_mag = np.sqrt(np.sum(s_sca_like**2, axis=-1)).astype(np.float64)
-    s_delta_mag = np.sqrt(np.sum(s_delta**2, axis=-1)).astype(np.float64)
+    # s_total_mag = np.sqrt(np.sum(s_total**2, axis=-1)).astype(np.float64)
+    # s_inc_mag = np.sqrt(np.sum(s_inc**2, axis=-1)).astype(np.float64)
+    # s_sca_like_mag = np.sqrt(np.sum(s_sca_like**2, axis=-1)).astype(np.float64)
+    # s_delta_mag = np.sqrt(np.sum(s_delta**2, axis=-1)).astype(np.float64)
+    s_total_mag = (
+        _real_vector_magnitude(
+            s_total
+        )
+    )
+
+    s_inc_mag = (
+        _real_vector_magnitude(
+            s_inc
+        )
+    )
+
+    s_sca_like_mag = (
+        _real_vector_magnitude(
+            s_sca_like
+        )
+    )
+
+    s_delta_mag = (
+        _real_vector_magnitude(
+            s_delta
+        )
+    )
 
     plane_u_total, plane_v_total = _plane_components(s_total, plane=plane)
     plane_u_sca_like, plane_v_sca_like = _plane_components(s_sca_like, plane=plane)
@@ -1082,6 +1579,1205 @@ def plot_poynting_streamlines(
     )
 
     return ax
+
+from matplotlib.colors import PowerNorm
+
+def _prepare_relative_db_background(
+    values: np.ndarray,
+    *,
+    reference_percentile: float = 99.5,
+    display_dynamic_range_db: float = 40.0,
+    floor_dynamic_range_db: float = 80.0,
+    active_threshold_db: float = -79.0,
+    automatic_lower_limit: bool = False,
+    active_lower_percentile: float = 2.0,
+) -> tuple[
+    np.ndarray,
+    float,
+    float,
+    dict,
+]:
+    """
+    Prepare a robust relative-dB magnitude background.
+
+    The magnitude is normalized to a high percentile of all finite,
+    positive values. Display limits are then obtained from values
+    above the numerical floor, rather than from the full floor-dominated
+    distribution.
+
+    Returns
+    -------
+    background_db
+        Relative-dB map.
+
+    vmin, vmax
+        Recommended display limits.
+
+    diagnostics
+        Information about the normalization and active-pixel fraction.
+    """
+
+    values = np.asarray(
+        values,
+        dtype=float,
+    )
+
+    positive_mask = (
+        np.isfinite(values)
+        & (values > 0.0)
+    )
+
+    if not np.any(
+        positive_mask
+    ):
+
+        raise ValueError(
+            "The background contains no finite positive values."
+        )
+
+    positive_values = values[
+        positive_mask
+    ]
+
+    reference_value = float(
+        np.nanpercentile(
+            positive_values,
+            reference_percentile,
+        )
+    )
+
+    if (
+        not np.isfinite(
+            reference_value
+        )
+        or reference_value <= 0.0
+    ):
+
+        reference_value = float(
+            np.nanmax(
+                positive_values
+            )
+        )
+
+    floor_ratio = (
+        10.0
+        ** (
+            -floor_dynamic_range_db
+            / 10.0
+        )
+    )
+
+    floor_value = max(
+        reference_value
+        * floor_ratio,
+        np.finfo(float).tiny,
+    )
+
+    background_db = np.full_like(
+        values,
+        np.nan,
+        dtype=float,
+    )
+
+    background_db[
+        positive_mask
+    ] = (
+        10.0
+        * np.log10(
+            np.maximum(
+                values[
+                    positive_mask
+                ],
+                floor_value,
+            )
+            / reference_value
+        )
+    )
+
+    # Values above the reference percentile are intentionally
+    # saturated at 0 dB.
+    background_db = np.minimum(
+        background_db,
+        0.0,
+    )
+
+    active_mask = (
+        np.isfinite(
+            background_db
+        )
+        & (
+            background_db
+            > active_threshold_db
+        )
+    )
+
+    if not np.any(
+        active_mask
+    ):
+
+        vmin = (
+            -float(
+                display_dynamic_range_db
+            )
+        )
+
+    elif automatic_lower_limit:
+
+        vmin = float(
+            np.nanpercentile(
+                background_db[
+                    active_mask
+                ],
+                active_lower_percentile,
+            )
+        )
+
+        # Do not allow a wider displayed range than requested.
+        vmin = max(
+            vmin,
+            -float(
+                display_dynamic_range_db
+            ),
+        )
+
+    else:
+
+        vmin = (
+            -float(
+                display_dynamic_range_db
+            )
+        )
+
+    vmax = 0.0
+
+    diagnostics = {
+        "reference_percentile": float(
+            reference_percentile
+        ),
+        "reference_value": (
+            reference_value
+        ),
+        "floor_value": (
+            floor_value
+        ),
+        "floor_dynamic_range_db": float(
+            floor_dynamic_range_db
+        ),
+        "display_vmin_db": (
+            vmin
+        ),
+        "display_vmax_db": (
+            vmax
+        ),
+        "positive_pixel_fraction": float(
+            np.mean(
+                positive_mask
+            )
+        ),
+        "active_pixel_fraction": float(
+            np.mean(
+                active_mask
+            )
+        ),
+        "floor_saturated_fraction": float(
+            np.mean(
+                positive_mask
+                & (
+                    background_db
+                    <= active_threshold_db
+                )
+            )
+        ),
+    }
+
+    return (
+        background_db,
+        vmin,
+        vmax,
+        diagnostics,
+    )
+
+def _prepare_region_normalized_db_background(
+    field_result: FieldMapResult,
+    values: np.ndarray,
+    *,
+    normalization_region: Literal[
+        "all",
+        "inside",
+        "outside",
+    ] = "outside",
+    reference_percentile: float = 99.5,
+    display_dynamic_range_db: float = 30.0,
+    floor_dynamic_range_db: float = 80.0,
+    mask_unreliable_inside: bool = False,
+) -> tuple[
+    np.ndarray,
+    float,
+    float,
+    dict,
+]:
+    """
+    Prepare a relative-dB background using a selected spatial region.
+
+    The normalization region determines the reference magnitude but
+    does not necessarily determine which region is displayed.
+
+    For total-flow plots with unstable internal fields, use
+    normalization_region="outside" and mask_unreliable_inside=True.
+    """
+
+    values = np.asarray(
+        values,
+        dtype=float,
+    )
+
+    inside_sphere = (
+        field_result.radial_distance_m
+        <= field_result.outer_radius_m
+    )
+
+    outside_sphere = ~inside_sphere
+
+    finite_positive = (
+        np.isfinite(values)
+        & (values > 0.0)
+    )
+
+    if normalization_region == "all":
+
+        normalization_mask = (
+            finite_positive
+        )
+
+    elif normalization_region == "inside":
+
+        normalization_mask = (
+            finite_positive
+            & inside_sphere
+        )
+
+    elif normalization_region == "outside":
+
+        normalization_mask = (
+            finite_positive
+            & outside_sphere
+        )
+
+    else:
+
+        raise ValueError(
+            "normalization_region must be "
+            "'all', 'inside', or 'outside'."
+        )
+
+    if not np.any(
+        normalization_mask
+    ):
+
+        raise ValueError(
+            "The selected normalization region contains no "
+            "finite positive values."
+        )
+
+    reference_value = float(
+        np.nanpercentile(
+            values[
+                normalization_mask
+            ],
+            reference_percentile,
+        )
+    )
+
+    if (
+        not np.isfinite(reference_value)
+        or reference_value <= 0.0
+    ):
+
+        raise ValueError(
+            "The calculated background reference is invalid."
+        )
+
+    floor_ratio = (
+        10.0
+        ** (
+            -float(
+                floor_dynamic_range_db
+            )
+            / 10.0
+        )
+    )
+
+    floor_value = max(
+        reference_value
+        * floor_ratio,
+        np.finfo(float).tiny,
+    )
+
+    background_db = np.full_like(
+        values,
+        np.nan,
+        dtype=float,
+    )
+
+    background_db[
+        finite_positive
+    ] = (
+        10.0
+        * np.log10(
+            np.maximum(
+                values[
+                    finite_positive
+                ],
+                floor_value,
+            )
+            / reference_value
+        )
+    )
+
+    # Saturate values above the selected reference.
+    background_db = np.minimum(
+        background_db,
+        0.0,
+    )
+
+    if mask_unreliable_inside:
+
+        background_db[
+            inside_sphere
+        ] = np.nan
+
+    vmin = (
+        -float(
+            display_dynamic_range_db
+        )
+    )
+
+    vmax = 0.0
+
+    diagnostics = {
+        "normalization_region": (
+            normalization_region
+        ),
+        "reference_percentile": (
+            reference_percentile
+        ),
+        "reference_value": (
+            reference_value
+        ),
+        "display_vmin_db": vmin,
+        "display_vmax_db": vmax,
+        "inside_masked": (
+            mask_unreliable_inside
+        ),
+        "finite_positive_fraction": float(
+            np.mean(
+                finite_positive
+            )
+        ),
+    }
+
+    return (
+        background_db,
+        vmin,
+        vmax,
+        diagnostics,
+    )
+
+def plot_poynting_streamlines_safe(
+    field_result: FieldMapResult,
+    *,
+    flow_kind: FlowKind = "total",
+    background_kind: Literal[
+        "total",
+        "scattered",
+        "delta",
+    ] = "total",
+    background_scale: ScaleMode = "db",
+    background_floor_fraction: float = 1e-8,
+    background_cmap: str = "inferno",
+    background_clip_percentile_low: float = 0.0,
+    background_clip_percentile_high: float = 99.0,
+    background_normalization="relative_db",
+    background_dynamic_range_db=40.0,
+    background_power_gamma=0.25,
+    background_reference_percentile=99.5,
+    streamline_color: str = "#00E5FF",
+    streamline_linewidth: float = 0.8,
+    streamline_density: float = 1.0,
+    streamline_arrowsize: float = 1.0,
+    arrowstyle: str = "->",
+    integration_direction: Literal[
+        "forward",
+        "backward",
+        "both",
+    ] = "both",
+    minlength: float = 0.03,
+    maxlength: float = 10.0,
+    broken_streamlines: bool = True,
+    normalize_vectors: bool = True,
+    vector_dynamic_range_decades: float = 4.0,
+    minimum_speed_percentile: float = 0.25,
+    mask_inside_sphere: bool = False,
+    start_points_nm: np.ndarray | None = None,
+    seed_individually: bool = True,
+    show_boundaries: bool = False,
+    show_outer_boundary: bool = True,
+    ax: plt.Axes | None = None,
+):
+    """
+    Robust Poynting streamline plot.
+
+    The function avoids overflow, rejects invalid seeds, and optionally
+    integrates each seed independently. Integrating seeds independently
+    prevents one zero-length trajectory from terminating the entire plot.
+
+    Notes
+    -----
+    The total incident Poynting vector is along +z. Therefore the xy
+    plane excludes the dominant Sz component and is generally unsuitable
+    for total-flow streamlines.
+    """
+
+    if ax is None:
+        _, ax = plt.subplots()
+
+    # ------------------------------------------------------------
+    # Select in-plane vector field
+    # ------------------------------------------------------------
+
+    if flow_kind == "total":
+
+        U = np.asarray(
+            field_result.plane_u_total,
+            dtype=float,
+        ).copy()
+
+        V = np.asarray(
+            field_result.plane_v_total,
+            dtype=float,
+        ).copy()
+
+    elif flow_kind == "scattered":
+
+        U = np.asarray(
+            field_result.plane_u_sca_like,
+            dtype=float,
+        ).copy()
+
+        V = np.asarray(
+            field_result.plane_v_sca_like,
+            dtype=float,
+        ).copy()
+
+    elif flow_kind == "delta":
+
+        U = np.asarray(
+            field_result.plane_u_delta,
+            dtype=float,
+        ).copy()
+
+        V = np.asarray(
+            field_result.plane_v_delta,
+            dtype=float,
+        ).copy()
+
+    else:
+
+        raise ValueError(
+            "flow_kind must be 'total', 'scattered', or 'delta'."
+        )
+
+    finite_components = (
+        np.isfinite(U)
+        & np.isfinite(V)
+    )
+
+    U[
+        ~finite_components
+    ] = np.nan
+
+    V[
+        ~finite_components
+    ] = np.nan
+
+    # Numerically stable vector magnitude.
+    speed = np.hypot(
+        U,
+        V,
+    )
+
+    speed[
+        ~np.isfinite(speed)
+    ] = np.nan
+
+    # ------------------------------------------------------------
+    # Base mask
+    # ------------------------------------------------------------
+
+    mask = (
+        ~np.isfinite(U)
+        | ~np.isfinite(V)
+        | ~np.isfinite(speed)
+        | (speed <= 0.0)
+    )
+
+    if mask_inside_sphere:
+
+        mask |= (
+            field_result.radial_distance_m
+            <= field_result.outer_radius_m
+        )
+
+    finite_speed = speed[
+        ~mask
+    ]
+
+    if finite_speed.size == 0:
+
+        raise ValueError(
+            "No finite nonzero in-plane Poynting vectors remain."
+        )
+
+    # Mask only a low percentile, rather than a fraction of a
+    # potentially enormous maximum.
+    if minimum_speed_percentile > 0.0:
+
+        speed_threshold = float(
+            np.nanpercentile(
+                finite_speed,
+                minimum_speed_percentile,
+            )
+        )
+
+        mask |= (
+            speed < speed_threshold
+        )
+
+    remaining_speed = speed[
+        ~mask
+    ]
+
+    if remaining_speed.size == 0:
+
+        raise ValueError(
+            "All vectors were removed by speed filtering."
+        )
+
+    # ------------------------------------------------------------
+    # Rescale flow before streamplot
+    # ------------------------------------------------------------
+
+    robust_speed_scale = float(
+        np.nanpercentile(
+            remaining_speed,
+            99.0,
+        )
+    )
+
+    if (
+        not np.isfinite(
+            robust_speed_scale
+        )
+        or robust_speed_scale <= 0.0
+    ):
+
+        robust_speed_scale = float(
+            np.nanmax(
+                remaining_speed
+            )
+        )
+
+    U_relative = (
+        U
+        / robust_speed_scale
+    )
+
+    V_relative = (
+        V
+        / robust_speed_scale
+    )
+
+    relative_speed = np.hypot(
+        U_relative,
+        V_relative,
+    )
+
+    usable = (
+        ~mask
+        & np.isfinite(
+            relative_speed
+        )
+        & (
+            relative_speed > 0.0
+        )
+    )
+
+    U_plot = np.zeros_like(
+        U_relative
+    )
+
+    V_plot = np.zeros_like(
+        V_relative
+    )
+
+    if normalize_vectors:
+
+        U_plot[
+            usable
+        ] = (
+            U_relative[
+                usable
+            ]
+            / relative_speed[
+                usable
+            ]
+        )
+
+        V_plot[
+            usable
+        ] = (
+            V_relative[
+                usable
+            ]
+            / relative_speed[
+                usable
+            ]
+        )
+
+    else:
+
+        minimum_relative_speed = (
+            10.0
+            ** (
+                -float(
+                    vector_dynamic_range_decades
+                )
+            )
+        )
+
+        clipped_speed = np.clip(
+            relative_speed,
+            minimum_relative_speed,
+            1.0,
+        )
+
+        compressed_speed = (
+            (
+                np.log10(
+                    clipped_speed
+                )
+                - np.log10(
+                    minimum_relative_speed
+                )
+            )
+            / (
+                -np.log10(
+                    minimum_relative_speed
+                )
+            )
+        )
+
+        compressed_speed = (
+            0.05
+            + 0.95
+            * compressed_speed
+        )
+
+        U_plot[
+            usable
+        ] = (
+            U_relative[
+                usable
+            ]
+            / relative_speed[
+                usable
+            ]
+            * compressed_speed[
+                usable
+            ]
+        )
+
+        V_plot[
+            usable
+        ] = (
+            V_relative[
+                usable
+            ]
+            / relative_speed[
+                usable
+            ]
+            * compressed_speed[
+                usable
+            ]
+        )
+
+    valid_vector_mask = (
+        usable
+        & np.isfinite(U_plot)
+        & np.isfinite(V_plot)
+        & (
+            np.hypot(
+                U_plot,
+                V_plot,
+            )
+            > 0.0
+        )
+    )
+
+    U_masked = np.ma.array(
+        U_plot,
+        mask=(
+            ~valid_vector_mask
+        ),
+    )
+
+    V_masked = np.ma.array(
+        V_plot,
+        mask=(
+            ~valid_vector_mask
+        ),
+    )
+
+    # ------------------------------------------------------------
+    # Relative dB background
+    # ------------------------------------------------------------
+
+    if background_kind == "total":
+
+        background = np.asarray(
+            field_result.s_total_mag,
+            dtype=float,
+        )
+
+    elif background_kind == "scattered":
+
+        background = np.asarray(
+            field_result.s_sca_like_mag,
+            dtype=float,
+        )
+
+    elif background_kind == "delta":
+
+        background = np.asarray(
+            field_result.s_delta_mag,
+            dtype=float,
+        )
+
+    else:
+
+        raise ValueError(
+            "background_kind must be "
+            "'total', 'scattered', or 'delta'."
+        )
+
+    extent_nm = [
+        float(
+            field_result.coord1_m[0]
+            * 1e9
+        ),
+        float(
+            field_result.coord1_m[-1]
+            * 1e9
+        ),
+        float(
+            field_result.coord2_m[0]
+            * 1e9
+        ),
+        float(
+            field_result.coord2_m[-1]
+            * 1e9
+        ),
+    ]
+
+
+    if background_normalization == "relative_db":
+        (
+            background_plot,
+            background_vmin,
+            background_vmax,
+            background_diagnostics,
+        ) = _prepare_relative_db_background(
+            background,
+            reference_percentile=(
+                background_reference_percentile
+            ),
+            display_dynamic_range_db=(
+                background_dynamic_range_db
+            ),
+            floor_dynamic_range_db=80.0,
+            automatic_lower_limit=False,
+        )
+
+        image = ax.imshow(
+            background_plot,
+            origin="lower",
+            extent=extent_nm,
+            cmap=background_cmap,
+            vmin=background_vmin,
+            vmax=background_vmax,
+            aspect="equal",
+            zorder=0,
+        )
+
+    elif background_normalization == "power":
+
+        positive = (
+            np.isfinite(background)
+            & (background > 0.0)
+        )
+
+        reference_value = float(
+            np.nanpercentile(
+                background[
+                    positive
+                ],
+                background_reference_percentile,
+            )
+        )
+
+        background_plot = np.zeros_like(
+            background,
+            dtype=float,
+        )
+
+        background_plot[
+            positive
+        ] = np.clip(
+            background[
+                positive
+            ]
+            / reference_value,
+            0.0,
+            1.0,
+        )
+
+        image = ax.imshow(
+            background_plot,
+            origin="lower",
+            extent=extent_nm,
+            cmap=background_cmap,
+            norm=PowerNorm(
+                gamma=(
+                    background_power_gamma
+                ),
+                vmin=0.0,
+                vmax=1.0,
+            ),
+            aspect="equal",
+            zorder=0,
+        )
+
+    else:
+
+        raise ValueError(
+            "background_normalization must be "
+            "'relative_db' or 'power'."
+        )
+
+    colorbar = plt.colorbar(
+        image,
+        ax=ax,
+        fraction=0.046,
+        pad=0.02,
+    )
+
+    colorbar.set_label(
+        (
+            rf"$10\log_{{10}}"
+            rf"(|S_{{\mathrm{{{background_kind}}}}}|/"
+            rf"S_{{{background_clip_percentile_high:g}}})$ "
+            r"[dB]"
+        )
+    )
+
+    # ------------------------------------------------------------
+    # Validate seeds
+    # ------------------------------------------------------------
+
+    if start_points_nm is not None:
+
+        seeds = filter_streamline_seeds(
+            field_result,
+            start_points_nm,
+            valid_vector_mask=(
+                valid_vector_mask
+            ),
+            minimum_grid_cells_from_edge=1,
+        )
+
+    else:
+
+        seeds = None
+
+    X_nm = (
+        field_result.coord1_m
+        * 1e9
+    )
+
+    Y_nm = (
+        field_result.coord2_m
+        * 1e9
+    )
+
+    common_stream_arguments = {
+        "x": X_nm,
+        "y": Y_nm,
+        "u": U_masked,
+        "v": V_masked,
+        "color": streamline_color,
+        "density": streamline_density,
+        "linewidth": streamline_linewidth,
+        "arrowsize": (
+            streamline_arrowsize
+        ),
+        "arrowstyle": arrowstyle,
+        "integration_direction": (
+            integration_direction
+        ),
+        "minlength": minlength,
+        "maxlength": maxlength,
+        "broken_streamlines": (
+            broken_streamlines
+        ),
+        "zorder": 5,
+    }
+
+    plotted_seed_count = 0
+    rejected_seed_count = 0
+    streamline_set = None
+
+    if (
+        seeds is not None
+        and seed_individually
+    ):
+
+        # One invalid or zero-length trajectory no longer aborts
+        # the complete plot.
+        for seed in seeds:
+
+            try:
+
+                candidate = ax.streamplot(
+                    **common_stream_arguments,
+                    start_points=np.asarray(
+                        [seed],
+                        dtype=float,
+                    ),
+                )
+
+                streamline_set = candidate
+                plotted_seed_count += 1
+
+            except (
+                IndexError,
+                ValueError,
+                FloatingPointError,
+            ):
+
+                rejected_seed_count += 1
+
+    elif seeds is not None:
+
+        try:
+
+            streamline_set = (
+                ax.streamplot(
+                    **common_stream_arguments,
+                    start_points=seeds,
+                )
+            )
+
+            plotted_seed_count = len(
+                seeds
+            )
+
+        except IndexError:
+
+            warnings.warn(
+                "Combined streamplot failed because at least one "
+                "trajectory had zero length. Retrying seed by seed."
+            )
+
+            for seed in seeds:
+
+                try:
+
+                    candidate = ax.streamplot(
+                        **common_stream_arguments,
+                        start_points=np.asarray(
+                            [seed],
+                            dtype=float,
+                        ),
+                    )
+
+                    streamline_set = candidate
+                    plotted_seed_count += 1
+
+                except (
+                    IndexError,
+                    ValueError,
+                    FloatingPointError,
+                ):
+
+                    rejected_seed_count += 1
+
+    else:
+
+        streamline_set = ax.streamplot(
+            **common_stream_arguments
+        )
+
+    # ------------------------------------------------------------
+    # Boundaries
+    # ------------------------------------------------------------
+
+    if show_boundaries:
+
+        for radius_m in (
+            field_result.radii_m
+        ):
+
+            circle = Circle(
+                (0.0, 0.0),
+                radius=float(
+                    radius_m
+                    * 1e9
+                ),
+                fill=False,
+                edgecolor="white",
+                linewidth=0.20,
+                alpha=0.10,
+                zorder=6,
+            )
+
+            ax.add_patch(
+                circle
+            )
+
+    if show_outer_boundary:
+
+        outer_circle = Circle(
+            (0.0, 0.0),
+            radius=(
+                field_result.outer_radius_m
+                * 1e9
+            ),
+            fill=False,
+            edgecolor="white",
+            linewidth=0.9,
+            alpha=0.9,
+            zorder=7,
+        )
+
+        ax.add_patch(
+            outer_circle
+        )
+
+    plane_labels = {
+        "xy": (
+            "x [nm]",
+            "y [nm]",
+        ),
+        "xz": (
+            "x [nm]",
+            "z [nm]",
+        ),
+        "yz": (
+            "y [nm]",
+            "z [nm]",
+        ),
+    }
+
+    ax.set_xlabel(
+        plane_labels[
+            field_result.plane
+        ][0]
+    )
+
+    ax.set_ylabel(
+        plane_labels[
+            field_result.plane
+        ][1]
+    )
+
+    ax.set_aspect(
+        "equal",
+        adjustable="box",
+    )
+
+    diagnostics = {
+        "valid_vector_fraction": float(
+            np.mean(
+                valid_vector_mask
+            )
+        ),
+        "input_seed_count": (
+            0
+            if start_points_nm is None
+            else len(
+                start_points_nm
+            )
+        ),
+        "validated_seed_count": (
+            0
+            if seeds is None
+            else len(seeds)
+        ),
+        "plotted_seed_count": (
+            plotted_seed_count
+        ),
+        "rejected_seed_count": (
+            rejected_seed_count
+        ),
+        "speed_median": float(
+            np.nanpercentile(
+                remaining_speed,
+                50.0,
+            )
+        ),
+        "speed_p99": float(
+            np.nanpercentile(
+                remaining_speed,
+                99.0,
+            )
+        ),
+    }
+
+    diagnostics.update(
+        {
+            "background_reference_value": (
+                background_diagnostics[
+                    "reference_value"
+                ]
+            ),
+            "background_active_fraction": (
+                background_diagnostics[
+                    "active_pixel_fraction"
+                ]
+            ),
+            "background_floor_fraction": (
+                background_diagnostics[
+                    "floor_saturated_fraction"
+                ]
+            ),
+            "background_vmin_db": (
+                background_diagnostics[
+                    "display_vmin_db"
+                ]
+            ),
+            "background_vmax_db": (
+                background_diagnostics[
+                    "display_vmax_db"
+                ]
+            ),
+        }
+    )
+
+    return (
+        ax,
+        streamline_set,
+        diagnostics,
+    )
 
 def plot_poynting_vectors(
     field_result: FieldMapResult,

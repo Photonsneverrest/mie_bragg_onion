@@ -124,7 +124,13 @@ def plot_differential_vs_theta(
     if not plot_all and show_legend:
         ax.legend()
 
-    fig.tight_layout()
+    # Do not switch from constrained layout to tight layout after a
+    # colorbar has been created. Matplotlib does not support changing
+    # to an incompatible layout engine at this stage.
+    layout_engine = fig.get_layout_engine()
+
+    if layout_engine is None:
+        fig.tight_layout()
 
     return fig, ax
 
@@ -320,7 +326,14 @@ def plot_polar_differential_scattering(
 
     ax.grid(True, alpha=0.3)
 
-    fig.tight_layout()
+    # Do not switch from constrained layout to tight layout after a
+    # colorbar has been created. Matplotlib does not support changing
+    # to an incompatible layout engine at this stage.
+    layout_engine = fig.get_layout_engine()
+
+    if layout_engine is None:
+        fig.tight_layout()
+
     return fig, ax
 
 def plot_integrated_efficiencies(

@@ -47,7 +47,7 @@ def plot_scattering_sectors(
     if y_mode == "db":
         vals = 10 * np.log10(np.maximum(stack, 1e-30))
         vals -= np.nanmax(vals)
-        ylabel = "Sector-integrated scattering (dB, normalized)"
+        ylabel = "Sector-integrated scattering [dB]"
     elif y_mode == "linear":
         vals = stack
         ylabel = "Sector-integrated scattering"
