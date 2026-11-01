@@ -1,0 +1,2 @@
+source ~/wslwork/bragg_onion_env/bin/activate
+cd ~/wslwork/mie_bragg_onion
