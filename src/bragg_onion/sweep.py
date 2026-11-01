@@ -39,6 +39,7 @@ from numpy.typing import NDArray
 from .materials import Dispersion
 from .geometry import (
     ExtinctionModifier,
+    LayerSubstitution,
     ExtraOuterShellSpec,
     build_bragg_onion_from_peak_wavelength,
     build_bragg_onion_from_thicknesses,
@@ -338,6 +339,7 @@ def run_bragg_onion_sweep(
     colour_normalization: Literal["max", "sum"] = "max",
     fixed_geometry_kwargs: dict[str, Any] | None = None,
     extinction_modifiers: ExtinctionModifier | list[ExtinctionModifier] | None = None,
+    layer_substitutions: LayerSubstitution | list[LayerSubstitution] | None = None,
     extra_outer_shell: ExtraOuterShellSpec | None = None,
     store_full_results: bool = False,
     progress: bool = True,
@@ -379,6 +381,8 @@ def run_bragg_onion_sweep(
         Additional geometry arguments held fixed for all sweep cases
     extinction_modifiers :
         Optional extinction modifiers applied to every case
+    layer_substitutions :
+        Optional complete-material replacements for selected zero-based layers.
     extra_outer_shell :
         Optional extra outer shell applied to every case
     store_full_results :
@@ -432,6 +436,7 @@ def run_bragg_onion_sweep(
             material_a=material_a,
             material_b=material_b,
             extinction_modifiers=extinction_modifiers,
+            layer_substitutions=layer_substitutions,
         )
 
         # --------------------------------------------------------
