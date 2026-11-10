@@ -1,0 +1,69 @@
+% Self-contained snippet: hollowing, absorber optimisation, and homogeneous controls.
+% Figure labels assume the manuscript structure proposed in the analysis.
+
+\subsection{Hollowing and absorbing-fill calculations}
+\label{sec:hollowing_methods}
+Starting from the 120-domain quarter-wave structure with $\lambda_0=470$~nm,
+$n_A=1.55$, $n_B=n_m=1$, and material A as the outermost domain, progressive
+hollowing was implemented by replacing radial domains from the centre outward by
+air while preserving every original radial boundary and the outer particle radius.
+Because the B domains already satisfy $n_B=n_m=1$, physically distinct structures
+occur after removal of successive A/B pairs. The selected $h=110$ structure leaves
+five high-index A domains in the outer reflector. The hollow was subsequently filled
+with a homogeneous material $\widetilde n_{\rm fill}=n_{\rm fill}+i\kappa_{\rm fill}$,
+with $n_{\rm fill}=1.00$--1.55 and $\kappa_{\rm fill}=3\times10^{-4}$--$2\times10^{-2}$.
+Candidate ranking used forward attenuation and backward retention at the same
+reference wavelength, blue-band integrals over 400--520~nm, visible-spectrum
+correlation, and the CIELAB colour difference $\Delta E_{76}$.
+
+\subsection{Homogeneous effective-medium controls}
+\label{sec:homogeneous_controls_methods}
+Equal-radius homogeneous spheres were calculated using both a volume-weighted
+permittivity and the Bruggeman relation. For the $h=110$ reference, the diameter is
+$23.197~\mu$m and the effective indices are $n_{\rm eff}=1.0619$ and 1.0446,
+respectively. The homogeneous-sphere extinction coefficient was varied from 0 to 3.
+The angle-resolved scattering amplitudes were evaluated on 721 polar angles from
+0 to $\pi$. The differential scattering efficiency was normalized so that its
+full-sphere integral equalled $Q_{\rm sca}$, and the forward and backward hemisphere
+efficiencies were obtained by integration over $0\leq\theta\leq\pi/2$ and
+$\pi/2\leq\theta\leq\pi$, respectively. The numerical closure
+$Q_F+Q_B-Q_{\rm sca}$ remained below $1.4\times10^{-15}$.
+
+\subsection{Material-efficient hollowing and scattering directionality}
+\label{sec:hollowing_results}
+The backward structural-colour response was governed predominantly by the outer
+radial reflector. Replacing 110 nominal inner domains by air preserved a broad blue
+backward-scattering band while leaving only five high-index domains. Weakly
+absorbing, intermediate-index hollow fills provided the best compromise between
+forward attenuation and colour retention. The leading colour-preserving case,
+$n_{\rm fill}=1.20$ and $\kappa_{\rm fill}=5\times10^{-4}$, attenuated forward
+scattering at the air-hollow backward peak by 0.55~dB, retained 98.2\% of the
+backward response at the same wavelength and 102.0\% of the blue-band backward
+integral, and produced $\Delta E_{76}=2.55$. Increasing $\kappa_{\rm fill}$ to
+$10^{-3}$ increased the attenuation to 0.67~dB while retaining 95.9\% of the
+same-wavelength backward response and 98.2\% of the blue-band integral. A
+liquid-like $n_{\rm fill}=1.33$, $\kappa_{\rm fill}=10^{-3}$ fill provided a similar
+trade-off with 0.69~dB attenuation and $\Delta E_{76}=4.81$.
+
+The homogeneous controls show why forward scattering cannot be removed by isotropic
+absorption alone. Their nonabsorbing response is strongly forward directed, and
+moderate extinction reduces the total scattering while increasing the asymmetry
+parameter toward unity. Very large extinction subsequently increases scattering
+again and reduces $g$, consistent with an opaque-particle diffraction limit.
+Consequently, isotropic loss can damp resonant structure but cannot eliminate the
+forward diffraction contribution of an optically large spherical particle.
+
+\paragraph{Numerical treatment for plotting.}
+For the nominally lossless hollow-onion control, a wavelength was classified as
+nonphysical only when $|Q_{\rm abs}|>10^{-6}$ or a plotted quantity was nonfinite.
+Only isolated invalid points bounded by valid neighbours were linearly interpolated
+in a plotting copy. Original values and an audit table were retained separately.
+No amplitude- or gradient-based outlier removal was applied, preventing sharp but
+physical Mie resonances from being discarded.
+
+\captionof{figure}{\textbf{Mechanism and homogeneous controls.}
+(a) Total scattering spectra of the hollow Bragg onion and equal-radius homogeneous
+controls. (b) Forward- and backward-hemisphere efficiencies. (c) Differential
+scattering efficiency at 470~nm. (d) Scattering and asymmetry of the Bruggeman
+homogeneous control as a function of extinction. Isotropic absorption damps the
+total scattering but does not remove the forward diffraction contribution.}
