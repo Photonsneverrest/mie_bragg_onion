@@ -1,0 +1,18 @@
+{
+  "inputs": [
+    "/mnt/d/Rocca/MieScattering/outputs/homogeneous_reference_470nm_v3/homogeneous_reference_spectra_v3.csv",
+    "/mnt/d/Rocca/MieScattering/outputs/homogeneous_reference_470nm_v3/homogeneous_reference_polar_470nm_v3.csv"
+  ],
+  "passivity_tolerance": 1e-06,
+  "masked_wavelength_nm": [
+    380.0,
+    423.0,
+    470.0,
+    658.0,
+    705.0,
+    709.0,
+    714.0,
+    760.0,
+    765.0
+  ]
+}
