@@ -35,11 +35,27 @@ frames/
 GIF/
 *.html
 
-# Local research / working content (not public)
+# Local research / working content
 notebooks/
-scripts/
-outputs/
+scripts/*
+!scripts/figures/
+!scripts/figures/**
+
+outputs/*
+!outputs/figures/
+!outputs/figures/**
+!outputs/tables/
+!outputs/tables/**
+!outputs/audits/
+!outputs/audits/**
+
 trash/
+
+# Manuscript content
+!manuscript/
+manuscript/*
+!manuscript/snippets/
+!manuscript/snippets/**
 # Windows-incompatible metadata files
 *:Zone.Identifier
 *:sec.endpointdlp
