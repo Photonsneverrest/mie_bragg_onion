@@ -1,0 +1,5 @@
+nohup: ignoring input
+Traceback (most recent call last):
+  File "/home/schwarzn/wslwork/mie_bragg_onion/scripts/run_core_field_enhancement_sweep_v4_small_spheres.py", line 56, in <module>
+    from bragg_onion._notebook_tools.field_analysis import rebuild_stack_from_row
+ModuleNotFoundError: No module named 'bragg_onion._notebook_tools.field_analysis'

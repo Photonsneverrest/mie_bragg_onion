@@ -40,3 +40,6 @@ notebooks/
 scripts/
 outputs/
 trash/
+# Windows-incompatible metadata files
+*:Zone.Identifier
+*:sec.endpointdlp

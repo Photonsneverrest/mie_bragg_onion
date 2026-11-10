@@ -47,6 +47,7 @@ __all__ = [
     "LayerThicknesses",
     "ExtraOuterShellSpec",
     "ExtinctionModifier",
+    "LayerSubstitution",
     "BraggOnionGeometry",
     "ResolvedLayerStack",
     "alternating_layer_labels",
@@ -137,6 +138,27 @@ class ExtinctionModifier:
     profile: float | Dispersion | Callable[[FloatArray], FloatArray | ComplexArray]
     name: str = "k_modifier"
 
+
+@dataclass(frozen=True)
+class LayerSubstitution:
+    """Replace selected zero-based layers, counted from the core, by a material.
+
+    Structural geometry and all radial boundaries remain unchanged. Only the
+    effective Dispersion assigned to the selected layers is replaced.
+    """
+    layer_indices: tuple[int, ...]
+    material: Dispersion
+    name: str = "layer_substitution"
+
+    def __post_init__(self) -> None:
+        indices = tuple(int(i) for i in self.layer_indices)
+        if len(indices) != len(set(indices)):
+            raise ValueError("LayerSubstitution.layer_indices contains duplicates.")
+        if any(i < 0 for i in indices):
+            raise ValueError("LayerSubstitution indices must be non-negative.")
+        if not _is_dispersion_like(self.material):
+            raise TypeError("LayerSubstitution.material must be dispersion-like.")
+        object.__setattr__(self, "layer_indices", indices)
 
 @dataclass(frozen=True)
 class BraggOnionGeometry:
@@ -808,6 +830,7 @@ def resolve_layer_stack(
     material_a: Dispersion,
     material_b: Dispersion,
     extinction_modifiers: ExtinctionModifier | Iterable[ExtinctionModifier] | None = None,
+    layer_substitutions: LayerSubstitution | Iterable[LayerSubstitution] | None = None,
 ) -> ResolvedLayerStack:
     """
     Resolve the effective material assigned to each layer.
@@ -823,6 +846,10 @@ def resolve_layer_stack(
         - one ExtinctionModifier
         - an iterable of ExtinctionModifier
         - None
+    layer_substitutions :
+        Optional complete-material replacements for selected layers. Indices
+        are zero-based from the core. Substitution is applied before optional
+        extinction modifiers.
 
     Returns
     -------
@@ -840,6 +867,29 @@ def resolve_layer_stack(
         modifier_list = [extinction_modifiers]
     else:
         modifier_list = list(extinction_modifiers)
+
+    if layer_substitutions is None:
+        substitution_list: list[LayerSubstitution] = []
+    elif isinstance(layer_substitutions, LayerSubstitution):
+        substitution_list = [layer_substitutions]
+    else:
+        substitution_list = list(layer_substitutions)
+
+    substitution_by_index: dict[int, LayerSubstitution] = {}
+    for substitution in substitution_list:
+        for layer_index in substitution.layer_indices:
+            if layer_index >= geometry.n_layers_total:
+                raise IndexError(
+                    f"Layer substitution index {layer_index} is outside "
+                    f"0..{geometry.n_layers_total - 1}."
+                )
+            if layer_index in substitution_by_index:
+                other = substitution_by_index[layer_index]
+                raise ValueError(
+                    f"Layer {layer_index} is assigned by both "
+                    f"{other.name!r} and {substitution.name!r}."
+                )
+            substitution_by_index[layer_index] = substitution
 
     layer_material_names: list[str] = []
     layer_dispersions: list[Dispersion] = []
@@ -860,6 +910,11 @@ def resolve_layer_stack(
             base_name = geometry.extra_outer_shell.name
         else:
             raise ValueError(f"Unknown layer label: {label!r}")
+
+        substitution = substitution_by_index.get(idx)
+        if substitution is not None:
+            base = substitution.material
+            base_name = substitution.name
 
         applicable_modifiers = [
             mod for mod in modifier_list
