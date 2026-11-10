@@ -1,0 +1,67 @@
+nohup: ignoring input
+
+==============================================================================
+n_fill = 1
+output = /mnt/d/Rocca/MieScattering/outputs/h110_fill_nk_sweep/h110_fill_n1
+command:
+/home/schwarzn/wslwork/bragg_onion_env/bin/python /home/schwarzn/wslwork/mie_bragg_onion/scripts/run_hollow_absorption_sweep.py --output-dir /mnt/d/Rocca/MieScattering/outputs/h110_fill_nk_sweep/h110_fill_n1 --design-wavelength-nm 470 --n-A 1.55 --n-B 1.0 --n-layers 120 --n-medium 1.0 --hollow-layers 110 --selected-hollow-layers 110 --absorber-n 1 --absorber-k 0.0003,0.0005,0.001,0.002,0.003,0.004,0.005,0.0075,0.01,0.015,0.02 --absorber-layer-counts 0 --wavelength-min-nm 380 --wavelength-max-nm 780 --wavelength-step-nm 1 --theta-points 721 --collection-na 1 --workers 8
+Completed n_fill=1; log=/mnt/d/Rocca/MieScattering/outputs/h110_fill_nk_sweep/h110_fill_n1.log
+
+==============================================================================
+n_fill = 1.05
+output = /mnt/d/Rocca/MieScattering/outputs/h110_fill_nk_sweep/h110_fill_n1p05
+command:
+/home/schwarzn/wslwork/bragg_onion_env/bin/python /home/schwarzn/wslwork/mie_bragg_onion/scripts/run_hollow_absorption_sweep.py --output-dir /mnt/d/Rocca/MieScattering/outputs/h110_fill_nk_sweep/h110_fill_n1p05 --design-wavelength-nm 470 --n-A 1.55 --n-B 1.0 --n-layers 120 --n-medium 1.0 --hollow-layers 110 --selected-hollow-layers 110 --absorber-n 1.05 --absorber-k 0.0003,0.0005,0.001,0.002,0.003,0.004,0.005,0.0075,0.01,0.015,0.02 --absorber-layer-counts 0 --wavelength-min-nm 380 --wavelength-max-nm 780 --wavelength-step-nm 1 --theta-points 721 --collection-na 1 --workers 8
+Completed n_fill=1.05; log=/mnt/d/Rocca/MieScattering/outputs/h110_fill_nk_sweep/h110_fill_n1p05.log
+
+==============================================================================
+n_fill = 1.1
+output = /mnt/d/Rocca/MieScattering/outputs/h110_fill_nk_sweep/h110_fill_n1p1
+command:
+/home/schwarzn/wslwork/bragg_onion_env/bin/python /home/schwarzn/wslwork/mie_bragg_onion/scripts/run_hollow_absorption_sweep.py --output-dir /mnt/d/Rocca/MieScattering/outputs/h110_fill_nk_sweep/h110_fill_n1p1 --design-wavelength-nm 470 --n-A 1.55 --n-B 1.0 --n-layers 120 --n-medium 1.0 --hollow-layers 110 --selected-hollow-layers 110 --absorber-n 1.1 --absorber-k 0.0003,0.0005,0.001,0.002,0.003,0.004,0.005,0.0075,0.01,0.015,0.02 --absorber-layer-counts 0 --wavelength-min-nm 380 --wavelength-max-nm 780 --wavelength-step-nm 1 --theta-points 721 --collection-na 1 --workers 8
+Completed n_fill=1.1; log=/mnt/d/Rocca/MieScattering/outputs/h110_fill_nk_sweep/h110_fill_n1p1.log
+
+==============================================================================
+n_fill = 1.2
+output = /mnt/d/Rocca/MieScattering/outputs/h110_fill_nk_sweep/h110_fill_n1p2
+command:
+/home/schwarzn/wslwork/bragg_onion_env/bin/python /home/schwarzn/wslwork/mie_bragg_onion/scripts/run_hollow_absorption_sweep.py --output-dir /mnt/d/Rocca/MieScattering/outputs/h110_fill_nk_sweep/h110_fill_n1p2 --design-wavelength-nm 470 --n-A 1.55 --n-B 1.0 --n-layers 120 --n-medium 1.0 --hollow-layers 110 --selected-hollow-layers 110 --absorber-n 1.2 --absorber-k 0.0003,0.0005,0.001,0.002,0.003,0.004,0.005,0.0075,0.01,0.015,0.02 --absorber-layer-counts 0 --wavelength-min-nm 380 --wavelength-max-nm 780 --wavelength-step-nm 1 --theta-points 721 --collection-na 1 --workers 8
+Completed n_fill=1.2; log=/mnt/d/Rocca/MieScattering/outputs/h110_fill_nk_sweep/h110_fill_n1p2.log
+
+==============================================================================
+n_fill = 1.33
+output = /mnt/d/Rocca/MieScattering/outputs/h110_fill_nk_sweep/h110_fill_n1p33
+command:
+/home/schwarzn/wslwork/bragg_onion_env/bin/python /home/schwarzn/wslwork/mie_bragg_onion/scripts/run_hollow_absorption_sweep.py --output-dir /mnt/d/Rocca/MieScattering/outputs/h110_fill_nk_sweep/h110_fill_n1p33 --design-wavelength-nm 470 --n-A 1.55 --n-B 1.0 --n-layers 120 --n-medium 1.0 --hollow-layers 110 --selected-hollow-layers 110 --absorber-n 1.33 --absorber-k 0.0003,0.0005,0.001,0.002,0.003,0.004,0.005,0.0075,0.01,0.015,0.02 --absorber-layer-counts 0 --wavelength-min-nm 380 --wavelength-max-nm 780 --wavelength-step-nm 1 --theta-points 721 --collection-na 1 --workers 8
+Completed n_fill=1.33; log=/mnt/d/Rocca/MieScattering/outputs/h110_fill_nk_sweep/h110_fill_n1p33.log
+
+==============================================================================
+n_fill = 1.4
+output = /mnt/d/Rocca/MieScattering/outputs/h110_fill_nk_sweep/h110_fill_n1p4
+command:
+/home/schwarzn/wslwork/bragg_onion_env/bin/python /home/schwarzn/wslwork/mie_bragg_onion/scripts/run_hollow_absorption_sweep.py --output-dir /mnt/d/Rocca/MieScattering/outputs/h110_fill_nk_sweep/h110_fill_n1p4 --design-wavelength-nm 470 --n-A 1.55 --n-B 1.0 --n-layers 120 --n-medium 1.0 --hollow-layers 110 --selected-hollow-layers 110 --absorber-n 1.4 --absorber-k 0.0003,0.0005,0.001,0.002,0.003,0.004,0.005,0.0075,0.01,0.015,0.02 --absorber-layer-counts 0 --wavelength-min-nm 380 --wavelength-max-nm 780 --wavelength-step-nm 1 --theta-points 721 --collection-na 1 --workers 8
+Completed n_fill=1.4; log=/mnt/d/Rocca/MieScattering/outputs/h110_fill_nk_sweep/h110_fill_n1p4.log
+
+==============================================================================
+n_fill = 1.5
+output = /mnt/d/Rocca/MieScattering/outputs/h110_fill_nk_sweep/h110_fill_n1p5
+command:
+/home/schwarzn/wslwork/bragg_onion_env/bin/python /home/schwarzn/wslwork/mie_bragg_onion/scripts/run_hollow_absorption_sweep.py --output-dir /mnt/d/Rocca/MieScattering/outputs/h110_fill_nk_sweep/h110_fill_n1p5 --design-wavelength-nm 470 --n-A 1.55 --n-B 1.0 --n-layers 120 --n-medium 1.0 --hollow-layers 110 --selected-hollow-layers 110 --absorber-n 1.5 --absorber-k 0.0003,0.0005,0.001,0.002,0.003,0.004,0.005,0.0075,0.01,0.015,0.02 --absorber-layer-counts 0 --wavelength-min-nm 380 --wavelength-max-nm 780 --wavelength-step-nm 1 --theta-points 721 --collection-na 1 --workers 8
+Completed n_fill=1.5; log=/mnt/d/Rocca/MieScattering/outputs/h110_fill_nk_sweep/h110_fill_n1p5.log
+
+==============================================================================
+n_fill = 1.55
+output = /mnt/d/Rocca/MieScattering/outputs/h110_fill_nk_sweep/h110_fill_n1p55
+command:
+/home/schwarzn/wslwork/bragg_onion_env/bin/python /home/schwarzn/wslwork/mie_bragg_onion/scripts/run_hollow_absorption_sweep.py --output-dir /mnt/d/Rocca/MieScattering/outputs/h110_fill_nk_sweep/h110_fill_n1p55 --design-wavelength-nm 470 --n-A 1.55 --n-B 1.0 --n-layers 120 --n-medium 1.0 --hollow-layers 110 --selected-hollow-layers 110 --absorber-n 1.55 --absorber-k 0.0003,0.0005,0.001,0.002,0.003,0.004,0.005,0.0075,0.01,0.015,0.02 --absorber-layer-counts 0 --wavelength-min-nm 380 --wavelength-max-nm 780 --wavelength-step-nm 1 --theta-points 721 --collection-na 1 --workers 8
+Completed n_fill=1.55; log=/mnt/d/Rocca/MieScattering/outputs/h110_fill_nk_sweep/h110_fill_n1p55.log
+
+Focused hollow-fill sweep finished.
+/mnt/d/Rocca/MieScattering/outputs/h110_fill_nk_sweep/h110_fill_n1
+/mnt/d/Rocca/MieScattering/outputs/h110_fill_nk_sweep/h110_fill_n1p05
+/mnt/d/Rocca/MieScattering/outputs/h110_fill_nk_sweep/h110_fill_n1p1
+/mnt/d/Rocca/MieScattering/outputs/h110_fill_nk_sweep/h110_fill_n1p2
+/mnt/d/Rocca/MieScattering/outputs/h110_fill_nk_sweep/h110_fill_n1p33
+/mnt/d/Rocca/MieScattering/outputs/h110_fill_nk_sweep/h110_fill_n1p4
+/mnt/d/Rocca/MieScattering/outputs/h110_fill_nk_sweep/h110_fill_n1p5
+/mnt/d/Rocca/MieScattering/outputs/h110_fill_nk_sweep/h110_fill_n1p55

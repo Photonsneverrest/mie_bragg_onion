@@ -1,0 +1,14 @@
+nohup: ignoring input
+{
+  "radius_nm": 11598.387096774202,
+  "diameter_um": 23.196774193548404,
+  "fA": 0.39812324989802034,
+  "fB": 0.6018767501019797,
+  "n_eff": {
+    "volume_eps": 1.2483460489711873,
+    "bruggeman": 1.2080600015280627
+  },
+  "dA_nm": 75.80645161290322,
+  "dB_nm": 117.5
+}
+Saved /mnt/d/Rocca/MieScattering/outputs/homogeneous_reference_470nm

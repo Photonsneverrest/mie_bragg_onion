@@ -1,0 +1,38 @@
+nohup: ignoring input
+{
+  "angle_input_unit": "radian",
+  "theta_points": 721,
+  "hollow_layers": 110,
+  "original_layers": 120,
+  "numerical_layers_after_merge": 10,
+  "radius_nm": 11598.387096774202,
+  "diameter_um": 23.196774193548404,
+  "dA_nm": 75.80645161290322,
+  "dB_nm": 117.5,
+  "high_index_volume_fraction": 0.3981232498980204,
+  "n_eff": {
+    "volume_eps": 1.0619301867603934,
+    "bruggeman": 1.0445922874839881
+  }
+}
+             model     mixing   n_real     k  qsca_max  qback_max  qforward_max   g_mean     qabs_max  closure_abs_max  lossless_residual_max
+hollow_bragg_onion       none      NaN 0.000  2.401645   0.479859      2.267455 0.756156 2.262394e-01     1.332268e-15           2.262394e-01
+       homogeneous  bruggeman 1.044592 0.000  2.487832   0.005218      2.485785 0.986664 4.529710e-13     1.332268e-15           5.439205e-12
+       homogeneous  bruggeman 1.044592 0.001  2.109944   0.002769      2.108586 0.987793 4.236866e-01     8.881784e-16           4.236866e-01
+       homogeneous  bruggeman 1.044592 0.003  1.642881   0.000995      1.642143 0.990023 8.047072e-01     8.881784e-16           8.047072e-01
+       homogeneous  bruggeman 1.044592 0.010  1.145994   0.000348      1.145655 0.994839 1.016846e+00     6.661338e-16           1.016846e+00
+       homogeneous  bruggeman 1.044592 0.030  1.035433   0.000426      1.035016 0.996758 1.033984e+00     6.661338e-16           1.033984e+00
+       homogeneous  bruggeman 1.044592 0.100  1.042786   0.001754      1.041031 0.991795 1.011838e+00     6.661338e-16           1.011838e+00
+       homogeneous  bruggeman 1.044592 0.300  1.116033   0.012800      1.103531 0.964637 9.514975e-01     6.661338e-16           9.514975e-01
+       homogeneous  bruggeman 1.044592 1.000  1.331166   0.103357      1.229793 0.832444 7.671873e-01     8.881784e-16           7.671873e-01
+       homogeneous  bruggeman 1.044592 3.000  1.791809   0.347606      1.448802 0.612942 3.770011e-01     6.661338e-16           3.770011e-01
+       homogeneous volume_eps 1.061930 0.000  2.404805   0.016831      2.397935 0.972747 3.550493e-13     1.332268e-15           6.243894e-12
+       homogeneous volume_eps 1.061930 0.001  2.113628   0.008208      2.108671 0.976807 4.351848e-01     1.332268e-15           4.351848e-01
+       homogeneous volume_eps 1.061930 0.003  1.716255   0.003358      1.713467 0.983075 8.170943e-01     6.661338e-16           8.170943e-01
+       homogeneous volume_eps 1.061930 0.010  1.198692   0.000848      1.197851 0.992819 1.017874e+00     6.661338e-16           1.017874e+00
+       homogeneous volume_eps 1.061930 0.030  1.041035   0.000681      1.040367 0.995780 1.042443e+00     6.661338e-16           1.042443e+00
+       homogeneous volume_eps 1.061930 0.100  1.045104   0.001975      1.043129 0.991319 1.015464e+00     6.661338e-16           1.015464e+00
+       homogeneous volume_eps 1.061930 0.300  1.114412   0.012774      1.101935 0.965044 9.544215e-01     6.661338e-16           9.544215e-01
+       homogeneous volume_eps 1.061930 1.000  1.327717   0.102100      1.227581 0.834076 7.707693e-01     6.661338e-16           7.707693e-01
+       homogeneous volume_eps 1.061930 3.000  1.787632   0.345818      1.446403 0.614092 3.807099e-01     8.881784e-16           3.807099e-01
+Saved /mnt/d/Rocca/MieScattering/outputs/homogeneous_reference_470nm_v3
