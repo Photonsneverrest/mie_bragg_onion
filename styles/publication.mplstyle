@@ -163,12 +163,4 @@ errorbar.capsize: 2.5
 # Color cycle
 # Okabe-Ito-inspired colorblind-friendly palette
 # ------------------------------------------------------------
-axes.prop_cycle: "cycler('color', [
-    '#0072B2',
-    '#D55E00',
-    '#009E73',
-    '#CC79A7',
-    '#E69F00',
-    '#56B4E9',
-    '#333333'
-])"
+axes.prop_cycle: "cycler('color', ['#0072B2','#D55E00','#009E73','#CC79A7','#E69F00','#56B4E9','#333333'])"
