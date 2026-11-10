@@ -35,12 +35,10 @@ frames/
 GIF/
 *.html
 
-# Local research / working content
-notebooks/
-scripts/*
-!scripts/figures/
-!scripts/figures/**
+# Exclude generated notebook outputs
+notebooks/outputs/
 
+# Publication outputs: track only selected directories
 outputs/*
 !outputs/figures/
 !outputs/figures/**
@@ -49,13 +47,14 @@ outputs/*
 !outputs/audits/
 !outputs/audits/**
 
-trash/
-
-# Manuscript content
-!manuscript/
+# Manuscript content: track only snippets
 manuscript/*
 !manuscript/snippets/
 !manuscript/snippets/**
+
+# Local temporary content
+trash/
+
 # Windows-incompatible metadata files
 *:Zone.Identifier
 *:sec.endpointdlp
