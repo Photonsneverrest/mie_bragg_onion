@@ -1,0 +1,15 @@
+{
+  "inputs": [
+    "outputs/fixed_outer_shell_size_sweep_470nm/fixed_outer_shell_size_summary.csv",
+    "outputs/fixed_outer_shell_size_sweep_470nm/fixed_outer_shell_size_spectra.csv"
+  ],
+  "passivity_tolerance": 1e-06,
+  "outputs": {
+    "Figure_size_dependence_fixed_outer_shell.pdf": "36ef5697e26cfa0be928425c6a7312efc3c06b04044ad68d04bb1498d6b49c24",
+    "fixed_outer_shell_size_spectra_plot_clean.csv": "27771fde0ec8b421eb1062e6f8c546188982cb8d5b7ec53033bfc6cc76d03837",
+    "Table_size_sweep_colour_metrics.csv": "907463daecca65ab4ad00e96947ebf9da9c6008c51a9a30c9c6f8f30ec79709e",
+    "fixed_outer_shell_size_metrics.csv": "b20dc7da3c6008cb92ae4bdc43294d1f92150826dbaf83840d803eeeb399526a",
+    "Figure_size_dependence_fixed_outer_shell.png": "7c93244caff3bce459f0c6b1e80cf43733041ec46c5524190bb7bae544c7b220",
+    "fixed_outer_shell_size_spike_audit.csv": "f268cb78085602bf0812f3d84aef113c31d8651552d7eafd5d292a6bc3ee2300"
+  }
+}

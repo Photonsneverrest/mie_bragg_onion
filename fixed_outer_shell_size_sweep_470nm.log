@@ -1,0 +1,23 @@
+nohup: ignoring input
+Fixed shell: 10 domains = 5 A + 5 B; radial thickness=966.532258 nm; minimum diameter=1.933065 um
+ diameter_um  core_radius_nm  core_thickness_factor  design_wavelength_nm  n_A  n_B  n_medium  outer_domains  n_layers_model  collection_na            task_hash
+         5.0     1533.467742              20.228723                 470.0 1.55  1.0       1.0             10              11            1.0 8cd1b57be7442bb899da
+         7.5     2783.467742              36.718085                 470.0 1.55  1.0       1.0             10              11            1.0 0696c9261f0d8115c3f5
+        10.0     4033.467742              53.207447                 470.0 1.55  1.0       1.0             10              11            1.0 192f0e9ce9a6e58ce0c7
+        12.5     5283.467742              69.696809                 470.0 1.55  1.0       1.0             10              11            1.0 8ff781b4cbb46ff27534
+        15.0     6533.467742              86.186170                 470.0 1.55  1.0       1.0             10              11            1.0 1a38e42ce9457dba7efc
+        20.0     9033.467742             119.164894                 470.0 1.55  1.0       1.0             10              11            1.0 9d4a3a90b3ee72152e93
+        25.0    11533.467742             152.143617                 470.0 1.55  1.0       1.0             10              11            1.0 e805ad762d04fdb7cc56
+        30.0    14033.467742             185.122340                 470.0 1.55  1.0       1.0             10              11            1.0 0834d91db09b31322403
+        40.0    19033.467742             251.079787                 470.0 1.55  1.0       1.0             10              11            1.0 87f7b390cd50c082dcd3
+Manifest only: False
+calculated 5.0
+calculated 7.5
+calculated 10.0
+calculated 12.5
+calculated 15.0
+calculated 20.0
+calculated 25.0
+calculated 30.0
+calculated 40.0
+Saved outputs/fixed_outer_shell_size_sweep_470nm
