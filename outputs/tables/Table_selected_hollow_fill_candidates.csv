@@ -1,0 +1,4 @@
+role,n_fill,k_fill,A_F_refpeak_dB,R_B_refpeak,R_B_blue,R_F_blue,rho_B_visible,DeltaE76,task_hash
+Colour-preserving,1.2,0.0005,0.549518,0.981953,1.019775,0.980316,0.996884,2.554739,5a6dbff23be0c6c3d830
+Balanced attenuation,1.2,0.001,0.673813,0.958799,0.981923,0.944319,0.996224,3.858931,2a8d82c0881b7cd8f2b3
+Liquid-like alternative,1.33,0.001,0.692461,0.958202,0.97748,0.93503,0.995096,4.81266,0984e0377b851f0aa1fe
