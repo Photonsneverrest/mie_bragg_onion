@@ -1,0 +1,52 @@
+# Frozen production specification for the dispersive PS/PMMA study.
+# 380 nm is retained only in the idealized study because the selected polymer
+# optical-constant tables begin at 400 nm.
+project: ps_pmma_real_material
+material_a: Polystyrene
+material_b: PolymethylMethacrylate
+material_files:
+  A: RefractiveIndices/Polystyrene.txt
+  B: RefractiveIndices/PolymethylMethacrylate.txt
+material_data_citation_key: Zhang2020PolymerComplexRefractiveIndices
+extrapolation: error
+design_wavelengths_nm: [470, 540, 580, 620, 680, 760, 850]
+layer_counts: [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 24, 28, 32, 36, 40, 48, 56, 64, 72, 80, 90, 100, 110, 120]
+outer_layer: A
+surrounding_index: 1.0
+wavelength_grid_nm:
+  minimum: 400
+  maximum: 900
+  step: 1
+angular_grid:
+  minimum_deg: 0
+  maximum_deg: 180
+  points: 721
+collection:
+  na: 1.0
+  directions: [backward, forward]
+colour:
+  wavelength_min_nm: 400
+  wavelength_max_nm: 780
+  normalize_input: true
+  normalization: max
+intact_selection:
+  primary_score: eta_C_times_eta_L
+  report: [eta_C, eta_L, L, a, b, C, hue_deg, backward_integral, peak_retention]
+hollowing_selection:
+  backward_integral_retention_min: 0.90
+  visible_backward_spectral_correlation_min: 0.98
+  delta_E76_max: 5.0
+  colour_performance_retention_min: 0.90
+  choose: fewest_remaining_PS_domains
+realistic_absorber:
+  description: idealized melanin-like constant complex refractive index
+  n_fill: 1.75
+  k_fill: [0.0, 0.001, 0.003, 0.01, 0.03, 0.1, 0.3]
+  design_wavelengths_nm: [470, 580]
+  citation_keys:
+    - Stavenga2015MelaninRefractiveIndex
+    - Li2020SyntheticMelaninOpticalConstants
+  caveat: >-
+    n=1.75 is a literature-supported visible-range melanin-like reference, not
+    a universal melanin optical constant. k is swept because melanin chemistry,
+    preparation and wavelength strongly affect absorption.
