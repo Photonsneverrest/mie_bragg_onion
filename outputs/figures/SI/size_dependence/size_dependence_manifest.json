@@ -1,0 +1,26 @@
+{
+  "script": "make_size_dependence_publication_assets.py",
+  "inputs": {
+    "outputs/figures/main/size_sweep/fixed_outer_shell_size_metrics.csv": "b20dc7da3c6008cb92ae4bdc43294d1f92150826dbaf83840d803eeeb399526a",
+    "outputs/figures/main/size_sweep/fixed_outer_shell_size_spectra_plot_clean.csv": "27771fde0ec8b421eb1062e6f8c546188982cb8d5b7ec53033bfc6cc76d03837",
+    "outputs/figures/main/size_sweep/fixed_outer_shell_size_spike_audit.csv": "f268cb78085602bf0812f3d84aef113c31d8651552d7eafd5d292a6bc3ee2300"
+  },
+  "screening": "No new screening. Uses upstream cleaned plotting spectra and preserves the supplied audit.",
+  "diameters_um": [
+    5.0,
+    7.5,
+    10.0,
+    12.5,
+    15.0,
+    20.0,
+    25.0,
+    30.0,
+    40.0
+  ],
+  "outputs": [
+    "Figure_size_dependence_fixed_outer_shell.pdf",
+    "Figure_size_dependence_fixed_outer_shell.png",
+    "Table_size_dependence_evidence.csv",
+    "Table_size_dependence_evidence.tex"
+  ]
+}
