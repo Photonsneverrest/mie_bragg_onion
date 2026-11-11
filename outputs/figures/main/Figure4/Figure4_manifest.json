@@ -1,0 +1,32 @@
+{
+  "inputs": {
+    "summary_470": "/mnt/d/Rocca/MieScattering/outputs/hollow_absorption_470nm_fine/hollow_absorption_summary.csv",
+    "checkpoints_470": "/mnt/d/Rocca/MieScattering/outputs/hollow_absorption_470nm_fine",
+    "summary_580": "/mnt/d/Rocca/MieScattering/outputs/hollowing_580nm_nA1p129/hollow_absorption_summary.csv",
+    "checkpoints_580": "/mnt/d/Rocca/MieScattering/outputs/hollowing_580nm_nA1p129",
+    "output_dir": "outputs/figures/main/Figure4",
+    "style": "styles/publication.mplstyle"
+  },
+  "passivity_tolerance": 1e-06,
+  "selected_A_domains": {
+    "470": [
+      60,
+      13,
+      5,
+      0
+    ],
+    "580": [
+      60,
+      31,
+      5,
+      0
+    ]
+  },
+  "threshold_definition": "smallest A count reached continuously from intact sphere without dropping below target",
+  "sha256": {
+    "Figure4_spike_audit.csv": "31588327add41861d8e672a662dad5e1bfbca8dc2587b5a86fc3ce6898250dff",
+    "Figure4_retention_thresholds.csv": "7a9c508f98ad12e5a996c3ea93c4ee0bf51bff2e19c43d2c4c44c8572ceb2ef4",
+    "Figure4_hollowing_outer_shell_dominance.pdf": "e73979df182ab87ed9f4861f7729249fb0ab8ee8a419a119ce1d742fc794e542",
+    "Figure4_hollowing_outer_shell_dominance.png": "82dcf09f08b48bb6ec05483c48ba33f102a1a30160dfa9f1c7f9647ab696340f"
+  }
+}

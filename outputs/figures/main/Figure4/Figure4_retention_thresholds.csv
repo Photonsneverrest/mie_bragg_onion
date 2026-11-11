@@ -1,0 +1,7 @@
+design_nm,retention_metric,target,minimum_contiguous_remaining_A_layers
+470,backward_spectrum_integral,0.9,13
+470,backward_spectrum_integral,0.8,2
+470,backward_spectrum_integral,0.5,1
+580,backward_spectrum_integral,0.9,31
+580,backward_spectrum_integral,0.8,19
+580,backward_spectrum_integral,0.5,4
