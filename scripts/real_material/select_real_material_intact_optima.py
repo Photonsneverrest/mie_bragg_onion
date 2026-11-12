@@ -8,6 +8,7 @@ def main():
  p.add_argument('--input-dir',required=True); p.add_argument('--output-dir',required=True); a=p.parse_args()
  inp=Path(a.input_dir); out=Path(a.output_dir); out.mkdir(parents=True,exist_ok=True)
  df=pd.read_csv(inp/'intact_summary.csv')
+ df = df[pd.to_numeric(df['n_layers'], errors='coerce') > 10].copy()
  df['colour_score']=pd.to_numeric(df.eta_C,errors='coerce').fillna(0)*pd.to_numeric(df.eta_L,errors='coerce').fillna(0)
  # Conservative tie-breaks: colour score, spectral integral, fewer layers.
  chosen=[]
@@ -28,6 +29,6 @@ def main():
  opt[[c for c in cols if c in opt]].to_csv(out/'Table_real_material_intact_optima.csv',index=False)
  latex=opt[[c for c in cols if c in opt]].to_latex(index=False,float_format=lambda x:f'{x:.4g}',escape=False)
  (out/'Table_real_material_intact_optima.tex').write_text(latex,encoding='utf-8')
- json_dump(out/'selection_manifest.json',{'method':'0.75 normalized eta_C*eta_L + 0.25 normalized backward integral; ties prefer fewer layers','source':str(inp/'intact_summary.csv')})
+ json_dump(out/'selection_manifest.json',{'method':'0.75 normalized eta_C*eta_L + 0.25 normalized backward integral; ties prefer fewer layers','filter':'n_layers > 10','source':str(inp/'intact_summary.csv')})
  print(opt[['design_nm','n_layers','diameter_nm','selection_score']].to_string(index=False))
 if __name__=='__main__': main()
