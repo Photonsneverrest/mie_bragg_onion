@@ -1,0 +1,21 @@
+{
+  "inputs": {
+    "intact_dir": "outputs/real_material/ps_pmma_intact",
+    "optima_dir": "outputs/real_material/ps_pmma_optima",
+    "hollowing_dir": "outputs/real_material/ps_pmma_hollowing",
+    "melanin_dir": "outputs/real_material/ps_pmma_melanin_fill",
+    "output_dir": "outputs/figures/main/Figure7",
+    "style": "styles/publication.mplstyle",
+    "ideal_summary": null
+  },
+  "outputs": [
+    "tables/evidence_map.csv",
+    "tables/Table_real_material_hollowing_selection_full.csv",
+    "tables/Table_SI_real_material_complete.csv",
+    "tables/melanin_fill_tradeoff.csv",
+    "tables/Table_real_material_intact_optima_full.csv",
+    "tables/Table_SI_real_material_complete.tex",
+    "figures/Figure7_real_material_PS_PMMA.png",
+    "figures/Figure7_real_material_PS_PMMA.pdf"
+  ]
+}

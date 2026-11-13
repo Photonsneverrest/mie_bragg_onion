@@ -1,0 +1,5 @@
+claim,evidence
+Intact PS/PMMA optimum for each design,Figure7a; Table_real_material_intact_optima_full.csv
+Minimum hollow geometry retaining defined colour performance,Figure7b; Table_real_material_hollowing_selection_full.csv
+Calculated realistic colour coordinates,Figure7c; Table_SI_real_material_complete.csv
+Melanin-like fill trade-off at 470 and 580 nm,Figure7d; melanin_fill_tradeoff.csv
